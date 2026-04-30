@@ -23,23 +23,207 @@ class Game {
   constructor(initialState) {
     // eslint-disable-next-line no-console
     console.log(initialState);
+
+    this.board = initialState || [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ];
+
+    this.score = 0;
+    this.status = 'idle';
   }
 
-  moveLeft() {}
-  moveRight() {}
-  moveUp() {}
-  moveDown() {}
+  moveLeft() {
+    const result = [];
+    let scoreAddTotal = 0;
+
+    for (let i = 0; i < this.board.length; i++) {
+      const { newRow, scoreAdd } = this.slideAndMerge(this.board[i]);
+
+      result.push(newRow);
+      scoreAddTotal += scoreAdd;
+    }
+
+    let changed = false;
+
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        if (this.board[i][j] !== result[i][j]) {
+          changed = true;
+          break;
+        }
+      }
+
+      if (changed) {
+        break;
+      }
+    }
+
+    if (!changed) {
+      return false;
+    }
+
+    this.board = result;
+    this.score += scoreAddTotal;
+    this.addRandomTile();
+    this.checkWin();
+    this.checkGameOver();
+
+    return true;
+  }
+
+  moveRight() {
+    const result = [];
+    let scoreAddTotal = 0;
+
+    for (let i = 0; i < this.board.length; i++) {
+      const reversed = [...this.board[i]].reverse();
+      const { newRow, scoreAdd } = this.slideAndMerge(reversed);
+
+      result.push([...newRow].reverse());
+      scoreAddTotal += scoreAdd;
+    }
+
+    let changed = false;
+
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        if (this.board[i][j] !== result[i][j]) {
+          changed = true;
+          break;
+        }
+      }
+
+      if (changed) {
+        break;
+      }
+    }
+
+    if (!changed) {
+      return false;
+    }
+
+    this.board = result;
+    this.score += scoreAddTotal;
+    this.addRandomTile();
+    this.checkWin();
+    this.checkGameOver();
+
+    return true;
+  }
+
+  moveUp() {
+    const result = [];
+    let totalScoreAdd = 0;
+
+    const transposed = this.transpose(this.board);
+
+    for (let i = 0; i < transposed.length; i++) {
+      const { newRow, scoreAdd } = this.slideAndMerge(transposed[i]);
+
+      result.push(newRow);
+      totalScoreAdd += scoreAdd;
+    }
+
+    let changed = false;
+
+    for (let i = 0; i < transposed.length; i++) {
+      for (let j = 0; j < transposed[i].length; j++) {
+        if (this.board[i][j] !== this.transpose(result)[i][j]) {
+          changed = true;
+          break;
+        }
+      }
+
+      if (changed) {
+        break;
+      }
+    }
+
+    if (!changed) {
+      return false;
+    }
+
+    this.board = this.transpose(result);
+    this.score += totalScoreAdd;
+    this.addRandomTile();
+    this.checkWin();
+    this.checkGameOver();
+
+    return true;
+  }
+
+  moveDown() {
+    const result = [];
+    let totalScoreAdd = 0;
+
+    const transposed = this.transpose(this.board);
+
+    for (let i = 0; i < transposed.length; i++) {
+      const row = transposed[i];
+
+      const copied = [...row];
+      const reversed = copied.reverse();
+
+      const { newRow, scoreAdd } = this.slideAndMerge(reversed);
+
+      const finalRow = newRow.reverse();
+
+      result.push(finalRow);
+      totalScoreAdd += scoreAdd;
+    }
+
+    let changed = false;
+
+    for (let i = 0; i < transposed.length; i++) {
+      for (let j = 0; j < transposed[i].length; j++) {
+        if (this.board[i][j] !== this.transpose(result)[i][j]) {
+          changed = true;
+          break;
+        }
+      }
+
+      if (changed) {
+        break;
+      }
+    }
+
+    if (!changed) {
+      return false;
+    }
+
+    const finalBoard = this.transpose(result);
+
+    this.board = finalBoard;
+    this.score += totalScoreAdd;
+    this.addRandomTile();
+    this.checkWin();
+    this.checkGameOver();
+
+    return true;
+  }
 
   /**
    * @returns {number}
    */
-  getScore() {}
+  getScore() {
+    return this.score;
+  }
 
-  /**
-   * @returns {number[][]}
-   */
-  getState() {}
+  getState() {
+    const result = [];
 
+    for (let i = 0; i < this.board.length; i++) {
+      const keep = this.board[i];
+      const copy = [...keep];
+
+      result.push(copy);
+    }
+
+    return result;
+  }
   /**
    * Returns the current game status.
    *
@@ -50,19 +234,171 @@ class Game {
    * `win` - the game is won;
    * `lose` - the game is lost
    */
-  getStatus() {}
-
+  getStatus() {
+    return this.status;
+  }
   /**
    * Starts the game.
    */
-  start() {}
+  start() {
+    this.board = [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ];
+
+    this.score = 0;
+    this.status = 'playing';
+
+    this.addRandomTile();
+    this.addRandomTile();
+  }
 
   /**
    * Resets the game.
    */
-  restart() {}
+  restart() {
+    this.start();
+  }
 
-  // Add your own methods here
+  getEmptyCells() {
+    const emptyCells = [];
+
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (this.board[i][j] === 0) {
+          emptyCells.push([i, j]);
+        }
+      }
+    }
+
+    return emptyCells;
+  }
+
+  addRandomTile() {
+    const keep = this.getEmptyCells();
+
+    if (keep.length === 0) {
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * keep.length);
+
+    const [i, j] = keep[randomIndex];
+
+    if (Math.random() < 0.9) {
+      this.board[i][j] = 2;
+    } else {
+      this.board[i][j] = 4;
+    }
+  }
+
+  slideAndMerge(row) {
+    const nonZero = row.filter((x) => x !== 0);
+
+    const result = [];
+    let scoreAdd = 0;
+
+    for (let i = 0; i < nonZero.length; i++) {
+      const current = nonZero[i];
+      const next = nonZero[i + 1];
+
+      if (current === next) {
+        result.push(current * 2);
+        scoreAdd += current * 2;
+
+        i++;
+      } else {
+        result.push(current);
+      }
+    }
+
+    while (result.length < 4) {
+      result.push(0);
+    }
+
+    return { newRow: result, scoreAdd };
+  }
+
+  checkWin() {
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        if (this.board[i][j] === 2048) {
+          this.status = 'win';
+
+          return;
+        }
+      }
+    }
+  }
+
+  canMove() {
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        const keep = this.board[i][j];
+        const next = this.board[i][j + 1];
+        const under = this.board[i + 1][j];
+
+        if (keep === 0) {
+          return true;
+        }
+
+        if (next !== undefined) {
+          if (keep === next) {
+            return true;
+          }
+        }
+
+        if (under !== undefined) {
+          if (keep === under) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  checkGameOver() {
+    const call = this.canMove();
+
+    if (call === false) {
+      this.status = 'lose';
+    }
+  }
+
+  transpose() {
+    const result = [];
+
+    for (let j = 0; j < this.board.length; j++) {
+      const words = [];
+
+      for (let i = 0; i < this.board.length; i++) {
+        const keep = this.board[i][j];
+
+        words.push(keep);
+      }
+
+      result.push(words);
+    }
+
+    return result;
+  }
+
+  reverseRows() {
+    const result = [];
+
+    for (let i = 0; i < this.board.length; i++) {
+      const keep = this.board[i];
+      const reversed = keep.reverse();
+
+      result.push(reversed);
+    }
+
+    return result;
+  }
 }
 
 module.exports = Game;
