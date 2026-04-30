@@ -338,7 +338,7 @@ class Game {
       for (let j = 0; j < this.board[i].length; j++) {
         const keep = this.board[i][j];
         const next = this.board[i][j + 1];
-        const under = this.board[i + 1][j];
+        const under = this.board[i + 1]?.[j];
 
         if (keep === 0) {
           return true;
@@ -401,4 +401,4 @@ class Game {
   }
 }
 
-module.exports = Game;
+export default Game;

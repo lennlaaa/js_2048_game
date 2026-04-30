@@ -1,6 +1,7 @@
 'use strict';
 
-const Game = import('../modules/Game.class');
+import Game from '../modules/Game.class.js';
+
 const game = new Game();
 
 function render() {
