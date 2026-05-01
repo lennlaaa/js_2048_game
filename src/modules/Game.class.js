@@ -385,16 +385,14 @@ class Game {
     }
   }
 
-  transpose() {
+  transpose(matrix) {
     const result = [];
 
-    for (let j = 0; j < this.board.length; j++) {
+    for (let j = 0; j < matrix.length; j++) {
       const words = [];
 
-      for (let i = 0; i < this.board.length; i++) {
-        const keep = this.board[i][j];
-
-        words.push(keep);
+      for (let i = 0; i < matrix.length; i++) {
+        words.push(matrix[i][j]);
       }
 
       result.push(words);
@@ -402,7 +400,6 @@ class Game {
 
     return result;
   }
-
   reverseRows() {
     const result = [];
 
