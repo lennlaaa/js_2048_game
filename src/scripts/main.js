@@ -53,6 +53,10 @@ function render() {
 }
 
 document.addEventListener('keydown', (e) => {
+  if (game.getStatus() !== 'playing') {
+    return;
+  }
+
   let moved = false;
 
   if (e.key === 'ArrowLeft') {
