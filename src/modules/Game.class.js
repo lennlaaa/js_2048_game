@@ -36,6 +36,10 @@ class Game {
   }
 
   moveLeft() {
+    if (this.status !== 'playing') {
+      return false;
+    }
+
     const result = [];
     let scoreAddTotal = 0;
 
@@ -75,6 +79,10 @@ class Game {
   }
 
   moveRight() {
+    if (this.status !== 'playing') {
+      return false;
+    }
+
     const result = [];
     let scoreAddTotal = 0;
 
@@ -115,6 +123,10 @@ class Game {
   }
 
   moveUp() {
+    if (this.status !== 'playing') {
+      return false;
+    }
+
     const result = [];
     let totalScoreAdd = 0;
 
@@ -156,6 +168,10 @@ class Game {
   }
 
   moveDown() {
+    if (this.status !== 'playing') {
+      return false;
+    }
+
     const result = [];
     let totalScoreAdd = 0;
 
