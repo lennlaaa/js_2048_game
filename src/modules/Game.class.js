@@ -139,11 +139,13 @@ class Game {
       totalScoreAdd += scoreAdd;
     }
 
+    const transposedResult = this.transpose(result);
+
     let changed = false;
 
     for (let i = 0; i < transposed.length; i++) {
       for (let j = 0; j < transposed[i].length; j++) {
-        if (this.board[i][j] !== this.transpose(result)[i][j]) {
+        if (this.board[i][j] !== transposedResult[i][j]) {
           changed = true;
           break;
         }
@@ -158,8 +160,9 @@ class Game {
       return false;
     }
 
-    this.board = this.transpose(result);
+    this.board = transposedResult;
     this.score += totalScoreAdd;
+
     this.addRandomTile();
     this.checkWin();
     this.checkGameOver();
@@ -180,22 +183,23 @@ class Game {
     for (let i = 0; i < transposed.length; i++) {
       const row = transposed[i];
 
-      const copied = [...row];
-      const reversed = copied.reverse();
+      const reversed = [...row].reverse();
 
       const { newRow, scoreAdd } = this.slideAndMerge(reversed);
 
-      const finalRow = newRow.reverse();
+      const finalRow = [...newRow].reverse();
 
       result.push(finalRow);
       totalScoreAdd += scoreAdd;
     }
 
+    const transposedResult = this.transpose(result);
+
     let changed = false;
 
     for (let i = 0; i < transposed.length; i++) {
       for (let j = 0; j < transposed[i].length; j++) {
-        if (this.board[i][j] !== this.transpose(result)[i][j]) {
+        if (this.board[i][j] !== transposedResult[i][j]) {
           changed = true;
           break;
         }
@@ -210,10 +214,9 @@ class Game {
       return false;
     }
 
-    const finalBoard = this.transpose(result);
-
-    this.board = finalBoard;
+    this.board = transposedResult;
     this.score += totalScoreAdd;
+
     this.addRandomTile();
     this.checkWin();
     this.checkGameOver();
@@ -400,6 +403,7 @@ class Game {
 
     return result;
   }
+
   reverseRows() {
     const result = [];
 
